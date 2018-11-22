@@ -1,27 +1,26 @@
 let accessToken;
 const clientId = '3c5bd929dd78433fa9473d1693180ba6';
-const redirectUri = 'http://localhost:3000';
+const redirectUri = 'http://localhost:3000/';
 
 let Spotify = {
   getAccessToken: function() {
     if (accessToken) {
       return accessToken;
-    } else {
+    } else if (window.location.href.match(/access_token=([^&]*)/)) {
       let token = window.location.href.match(/access_token=([^&]*)/);
       let expiry = window.location.href.match(/expires_in=([^&]*)/);
-      if (token && expiry) {
-        accessToken = token[1];
-        window.setTimeout(() => accessToken = '', expiry[1] * 1000);
-        window.history.pushState('Access Token', null, '/');
-      } else {
-        window.location = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
-      }
+      accessToken = token[1];
+      window.setTimeout(() => (accessToken = ''), expiry[1] * 1000);
+      window.history.pushState('Access Token', null, '/');
+      return accessToken;
+    } else {
+      window.location = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirectUri}`;
     }
   },
 
   search: function(term) {
     try {
-      Spotify.getAccessToken();
+      //Spotify.getAccessToken();
       return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`,
         {
           headers: {
@@ -105,7 +104,7 @@ let Spotify = {
               ).then(() => {
                 let trackList = [];
                 tracks.forEach( obj => {
-                  trackList.push(obj.uri);
+                  trackList.push(obj);
                 });
                 return {
                   headers: Object.assign(
