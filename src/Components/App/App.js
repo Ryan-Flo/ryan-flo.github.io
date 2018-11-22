@@ -86,6 +86,7 @@ class App extends React.Component {
 	}
 
 	async search(term) {
+		if (Spotify.getAccessToken()) {
 		const results = await Spotify.search(term);
 		this.setState({searchResults: results});
 		const resultIds = this.collectIds(false);
@@ -105,7 +106,10 @@ class App extends React.Component {
 		}
 		this.setState({searchResults: results});
 		this.setState({term: term});
+	} else {
+		console.log('No access token');
 	}
+}
 
 	render() {
 		return (
